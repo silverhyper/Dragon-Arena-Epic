@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dragon Arena Epic</title>
+    <style>
+        /* Base Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            color: #fff;
+        }
+
+        #gameContainer {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        /* Ensure only one screen is visible at a time */
+        #mainMenu, #dragonSelectionMenu, #levelMenu, #arena {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Main Menu Styles */
+        #mainMenu {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: url('https://via.placeholder.com/1500x1000?text=Main+Menu+Background') no-repeat center/cover;
+        }
+
+        #title {
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+            text-align: center;
+            padding-top: 20px;
+            font-size: 36px;
+        }
+
+        #cashDisplay {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            color: #39ff14;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14, 0 0 10px #39ff14;
+        }
+
+        #accountButtons {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #createAccountBtn, #loginBtn {
+            padding: 10px 20px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        #logoutBtn {
+            padding: 10px 20px;
+            background: #ff073a;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff073a;
+            display: none;
+        }
+
+        #accountForm {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #accountForm input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        #accountForm button {
+            padding: 10px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        #menuDragon {
+            position: absolute;
+            left: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .dragon-info {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .special-dragon-frame-gold {
+            box-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .special-dragon-frame-red {
+            box-shadow: 0 0 15px #ff073a, 0 0 30px #ff073a;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .special-dragon-frame-water {
+            box-shadow: 0 0 15px #00eaff, 0 0 30px #00eaff;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .special-dragon-frame-purple {
+            box-shadow: 0 0 15px #800080, 0 0 30px #800080;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .menu-dragon-label {
+            color: #ff073a;
+            text-shadow: 0 0 5px #ff073a, 0 0 10px #ff073a;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #dragonElement, #playerArenaElement {
+            font-size: 18px;
+            margin-left: 5px;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        .menu-dragon-emoji {
+            font-size: 150px;
+            line-height: 150px;
+            margin-bottom: 5px;
+        }
+
+        .stats {
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .stats.max-level {
+            color: #39ff14;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        .stats.special-gold {
+            color: #ffd700;
+            text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700;
+        }
+
+        .stats.special-max-level-red {
+            color: #ff073a;
+            text-shadow: 0 0 5px #ff073a, 0 0 10px #ff073a;
+        }
+
+        .stats.special-max-level-water {
+            color: #00eaff;
+            text-shadow: 0 0 5px #00eaff, 0 0 10px #00eaff;
+        }
+
+        .stats.special-max-level-purple {
+            color: #800080;
+            text-shadow: 0 0 5px #800080, 0 0 10px #800080;
+        }
+
+        #upgradeButton, #buyButton {
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+            box-shadow: 0 0 10px #39ff14;
+            transition: transform 0.2s;
+        }
+
+        #upgradeButton:hover, #buyButton:hover {
+            transform: scale(1.05);
+        }
+
+        .arrow {
+            font-size: 50px;
+            color: #39ff14;
+            cursor: pointer;
+            text-shadow: 0 0 5px #39ff14;
+            transition: transform 0.2s;
+        }
+
+        .arrow:hover {
+            transform: scale(1.2);
+        }
+
+        #playButton {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            text-shadow: 0 0 5px #39ff14;
+            box-shadow: 0 0 10px #39ff14;
+        }
+
+        #playButton:hover {
+            transform: scale(1.05);
+            background: #00cc00;
+        }
+
+        #pvpButton {
+            position: absolute;
+            bottom: 80px;
+            right: 30px;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #ff073a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            text-shadow: 0 0 5px #ff073a;
+            box-shadow: 0 0 10px #ff073a;
+        }
+
+        #pvpButton:hover {
+            transform: scale(1.05);
+            background: #ff4040;
+        }
+
+        #codeEntry {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #codeInput {
+            padding: 10px;
+            background: transparent;
+            border: 2px solid #39ff14;
+            border-radius: 5px;
+            color: #39ff14;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #submitCode {
+            padding: 10px 20px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        #codeManager {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        #codeManager h3 {
+            color: #39ff14;
+            text-shadow: 0 0 5px #39ff14;
+            margin: 0;
+        }
+
+        #codeManager input {
+            padding: 10px;
+            background: transparent;
+            border: 2px solid #39ff14;
+            border-radius: 5px;
+            color: #39ff14;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #addCodeBtn {
+            padding: 10px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        #activeCodesList {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .code-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px;
+            background: rgba(57, 255, 20, 0.1);
+            border-radius: 5px;
+        }
+
+        .code-details {
+            color: #39ff14;
+            font-size: 14px;
+            text-shadow: 0 0 5px #39ff14;
+        }
+
+        .delete-code {
+            cursor: pointer;
+            color: #ff073a;
+            text-shadow: 0 0 5px #ff073a;
+            font-size: 16px;
+        }
+
+        .delete-code:hover {
+            color: #ff4040;
+        }
+
+        #levelMenu {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background: url('https://via.placeholder.com/1500x1000?text=Level+Menu+Background') no-repeat center/cover;
+            overflow-y: auto;
+        }
+
+        #levelMenu h1 {
+            position: sticky;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-shadow: 2px 2px 4px #000;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+        }
+
+        #backButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+            box-shadow: 0 0 10px #39ff14;
+            transition: transform 0.2s;
+            z-index: 10;
+        }
+
+        #backButton:hover {
+            transform: scale(1.05);
+        }
+
+        #levelContainer {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 80px;
+            padding-bottom: 20px;
+            width: 100%;
+            max-width: 1200px;
+            align-items: center;
+        }
+
+        .level-row {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .level {
+            width: 80px;
+            height: 80px;
+            background: #39ff14;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ff073a;
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff073a;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 0 10px #39ff14;
+        }
+
+        .level.locked {
+            background: #555;
+            color: #999;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .level:hover:not(.locked) {
+            transform: scale(1.1);
+        }
+
+        #dragonSelectionMenu {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background: url('https://via.placeholder.com/1500x1000?text=Dragon+Selection+Background') no-repeat center/cover;
+            overflow-y: auto;
+        }
+
+        #dragonSlots {
+            display: flex;
+            gap: 20px;
+            margin-top: 80px;
+            justify-content: center;
+        }
+
+        .dragon-slot {
+            width: 200px;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .dragon-slot:hover {
+            transform: scale(1.05);
+        }
+
+        .slot-emoji {
+            font-size: 100px;
+        }
+
+        .slot-stats {
+            color: #fff;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        #dragonListContainer {
+            position: absolute;
+            bottom: 100px;
+            width: 80%;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #dragonList {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .dragon-option {
+            flex: 0 0 auto;
+            width: 120px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .dragon-option:hover {
+            transform: scale(1.05);
+        }
+
+        .dragon-option img {
+            width: 80px;
+            height: 80px;
+        }
+
+        .dragon-option-emoji {
+            font-size: 80px;
+        }
+
+        #battleButton {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            background: #ff073a;
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            text-shadow: 0 0 5px #ff073a;
+            box-shadow: 0 0 10px #ff073a;
+        }
+
+        #battleButton:hover {
+            transform: scale(1.05);
+            background: #ff4040;
+        }
+
+        #pvpBackButton {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #39ff14;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+            box-shadow: 0 0 10px #39ff14;
+            transition: transform 0.2s;
+        }
+
+        #pvpBackButton:hover {
+            transform: scale(1.05);
+        }
+
+        #arena {
+            display: none;
+            width: 80%;
+            height: 80%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+            flex-direction: column;
+            justify-content: space-between;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #battlefield {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 50%;
+            position: relative;
+        }
+
+        .dragon-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+
+        .dragon-label {
+            color: #ff073a;
+            text-shadow: 0 0 5px #ff073a, 0 0 10px #ff073a;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .dragon-emoji {
+            font-size: 150px;
+            line-height: 150px;
+            margin-bottom: 5px;
+        }
+
+        .health-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 5px;
+            position: relative;
+        }
+
+        .health-bar {
+            width: 100px;
+            height: 10px;
+            background: #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .health {
+            height: 100%;
+            background: #4caf50;
+            transition: width 0.5s ease;
+        }
+
+        .stamina-bar {
+            width: 100px;
+            height: 10px;
+            background: #ccc;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .stamina {
+            height: 100%;
+            background: #2196f3;
+            transition: width 0.5s ease;
+        }
+
+        .damage-text {
+            position: absolute;
+            top: -20px;
+            color: #39ff14;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #39ff14;
+            opacity: 0;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        #controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 16px;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #f77f00;
+        }
+
+        #log {
+            height: 20%;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        #chatMessages {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        #chatInputArea {
+            display: flex;
+            background: #39ff14;
+            border-radius: 5px;
+            padding: 5px;
+            margin-top: 10px;
+        }
+
+        #chatInput {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            color: #000;
+            font-size: 14px;
+            outline: none;
+        }
+
+        #chatInput::placeholder {
+            color: #333;
+        }
+
+        #sendChat {
+            background: #000;
+            color: #39ff14;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #sendChat:hover {
+            background: #333;
+        }
+
+        #dragonQueue {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        #enemyQueue {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .queue-dragon {
+            position: relative;
+            width: 40px;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            overflow: hidden;
+        }
+
+        .queue-dragon img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+        }
+
+        .knocked-out::after {
+            content: '✖';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: #ff073a;
+            text-shadow: 0 0 5px #ff073a, 0 0 10px #ff073a;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <!-- Main Menu -->
+        <div id="mainMenu">
+            <h1 id="title">Dragon Arena Epic</h1>
+            <div id="cashDisplay">$0</div>
+            <div id="accountButtons">
+                <button id="createAccountBtn" onclick="showCreateAccount()">Create Account</button>
+                <button id="loginBtn" onclick="showLogin()">Login</button>
+                <button id="logoutBtn" onclick="logout()">Logout</button>
+            </div>
+            <div id="menuDragon">
+                <span class="arrow" onclick="prevDragon()">◀</span>
+                <div class="dragon-info">
+                    <p class="menu-dragon-label">Your Dragon <span id="dragonElement"></span></p>
+                    <span class="menu-dragon-emoji" id="dragonEmoji">🐉</span>
+                    <div class="stats" id="dragonStats">Level 1<br>HP: 100<br>ATK: 10-10<br>STA: 5</div>
+                    <button id="upgradeButton" onclick="upgradeDragon()">Upgrade ($59)</button>
+                    <button id="buyButton" onclick="buyDragon(player.dragonIndex)" style="display: none;">Buy ($220)</button>
+                </div>
+                <span class="arrow" onclick="nextDragon()">▶</span>
+            </div>
+            <button id="pvpButton" onclick="showDragonSelection()">PvP</button>
+            <button id="playButton" onclick="showLevelMenu()">Play</button>
+            <div id="accountForm">
+                <input type="text" id="username" placeholder="Username (min 3 chars)">
+                <input type="password" id="password" placeholder="Password (min 6 chars)">
+                <button id="submitAccount" onclick="handleAccountSubmit()">Submit</button>
+            </div>
+            <div id="codeEntry">
+                <input type="text" id="codeInput" placeholder="Enter Code">
+                <button id="submitCode" onclick="submitCode()">SUBMIT</button>
+            </div>
+            <div id="codeManager">
+                <h3>Code Manager</h3>
+                <input type="text" id="newCode" placeholder="New Code">
+                <input type="number" id="codeReward" placeholder="Cash Reward">
+                <button id="addCodeBtn" onclick="addCode()">+</button>
+                <div id="activeCodesList"></div>
+            </div>
+        </div>
+
+        <!-- Dragon Selection Menu -->
+        <div id="dragonSelectionMenu">
+            <h1>Select Your Dragons</h1>
+            <button id="pvpBackButton" onclick="returnToMenuFromSelection()">Back</button>
+            <div id="dragonSlots">
+                <div class="dragon-slot" id="slot1" onclick="openDragonList(1)"></div>
+                <div class="dragon-slot" id="slot2" onclick="openDragonList(2)"></div>
+                <div class="dragon-slot" id="slot3" onclick="openDragonList(3)"></div>
+            </div>
+            <div id="dragonListContainer">
+                <div id="dragonList"></div>
+            </div>
+            <button id="battleButton" onclick="startPvPBattle()">Battle ($15)</button>
+        </div>
+
+        <!-- Level Menu -->
+        <div id="levelMenu">
+            <h1>Select a Level</h1>
+            <button id="backButton" onclick="returnToMenu()">Back</button>
+            <div id="levelContainer">
+                <div class="level-row">
+                    <div class="level" id="level1" onclick="startGame(1)">1</div>
+                    <div class="level" id="level2" onclick="startGame(2)">2</div>
+                    <div class="level" id="level3" onclick="startGame(3)">3</div>
+                    <div class="level" id="level4" onclick="startGame(4)">4</div>
+                    <div class="level" id="level5" onclick="startGame(5)">5</div>
+                </div>
+                <!-- Add remaining levels as needed -->
+            </div>
+        </div>
+
+        <!-- Arena -->
+        <div id="arena">
+            <h1>Dragon Arena Epic</h1>
+            <div id="dragonQueue"></div>
+            <div id="enemyQueue"></div>
+            <div id="battlefield">
+                <div class="dragon-section" id="playerSection">
+                    <p class="dragon-label">Your Dragon <span id="playerArenaElement"></span></p>
+                    <div class="health-container">
+                        <span class="dragon-emoji" id="playerArenaEmoji">🐉</span>
+                        <div class="health-bar"><div class="health" id="playerHealth" style="width: 100%;"></div></div>
+                        <div class="stamina-bar"><div class="stamina" id="playerStamina" style="width: 100%;"></div></div>
+                        <span class="damage-text" id="playerDamageText"></span>
+                    </div>
+                </div>
+                <div class="dragon-section" id="enemySection">
+                    <p class="dragon-label">Enemy Dragon</p>
+                    <div class="health-container">
+                        <span class="dragon-emoji" id="enemyArenaEmoji">🐉</span>
+                        <div class="health-bar"><div class="health" id="enemyHealth" style="width: 100%;"></div></div>
+                        <div class="stamina-bar"><div class="stamina" id="enemyStamina" style="width: 100%;"></div></div>
+                        <span class="damage-text" id="enemyDamageText"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="controls">
+                <button onclick="attack('claw')">Claw</button>
+                <button onclick="attack('tail')">Tail Whip (2 STA)</button>
+            </div>
+            <div id="log">
+                <div id="chatMessages">Battle begins!</div>
+                <div id="chatInputArea">
+                    <input type="text" id="chatInput" placeholder="Type your message...">
+                    <button id="sendChat" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dragon Definitions
+        const dragons = [
+            { emoji: "🐉", baseHp: 100, baseAtkMin: 10, baseAtkMax: 10, baseSta: 5, price: 0, element: "Fire" },
+            { emoji: "🐲", baseHp: 120, baseAtkMin: 19, baseAtkMax: 34, baseSta: 7, price: 220, element: "Earth" },
+            { emoji: "🐍", baseHp: 160, baseAtkMin: 28, baseAtkMax: 35, baseSta: 8, price: 650, element: "Earth" },
+            { emoji: `<img src="https://i.imgur.com/LHOBsug.png" style="width: 150px; height: 150px;" data-level100="https://i.imgur.com/cJnQKd0.png" />`, baseHp: 620, baseAtkMin: 85, baseAtkMax: 115, baseSta: 10, price: 2450, element: "Fire" },
+            { emoji: `<img src="https://i.imgur.com/mnlHhJh.png" style="width: 150px; height: 150px;" />`, baseHp: 700, baseAtkMin: 90, baseAtkMax: 120, baseSta: 15, price: 2800, element: "Earth" },
+            { emoji: `<img src="https://i.imgur.com/N2UyYqn.png" style="width: 150px; height: 150px;" />`, baseHp: 780, baseAtkMin: 80, baseAtkMax: 130, baseSta: 13, price: 3000, element: "Fire" },
+            { emoji: `<img src="https://i.imgur.com/3DHP9dZ.png" style="width: 150px; height: 150px;" />`, baseHp: 750, baseAtkMin: 110, baseAtkMax: 150, baseSta: 17, price: 3000, element: "Ice" },
+            { emoji: `<img src="https://i.imgur.com/VaDt2aL.png" style="width: 150px; height: 150px;" />`, baseHp: 710, baseAtkMin: 118, baseAtkMax: 180, baseSta: 12, price: 3100, element: "Fire" }
+        ];
+
+        const elementStrengths = {
+            "Ice": "Fire",
+            "Fire": "Earth",
+            "Earth": "Ice"
+        };
+
+        const elementIcons = {
+            "Fire": "🔥",
+            "Earth": "🌍",
+            "Ice": "❄️"
+        };
+
+        const dragonFrames = {
+            3: { maxLevelClass: "special-dragon-frame-red", statsClass: "special-max-level-red" },
+            4: { frameClass: "special-dragon-frame-gold", statsClass: "special-gold" },
+            5: { frameClass: "special-dragon-frame-red", statsClass: "special-max-level-red" },
+            6: { frameClass: "special-dragon-frame-water", statsClass: "special-max-level-water" },
+            7: { maxLevelClass: "special-dragon-frame-purple", statsClass: "special-max-level-purple" }
+        };
+
+        // Game State
+        let player = {
+            dragonIndex: 0,
+            hp: dragons[0].baseHp,
+            maxHp: dragons[0].baseHp,
+            atkMin: dragons[0].baseAtkMin,
+            atkMax: dragons[0].baseAtkMax,
+            sta: dragons[0].baseSta,
+            maxSta: dragons[0].baseSta,
+            element: dragons[0].element,
+            upgrades: 0
+        };
+        let enemy = { 
+            hp: 100, 
+            maxHp: 100, 
+            sta: 5, 
+            maxSta: 5, 
+            element: "Ice" 
+        };
+        let cash = 0;
+        let currentUser = null;
+        let isCreatingAccount = false;
+        let currentLevel = 1;
+        let battleEnded = false;
+        let playerTurn = true;
+        let pvpDragons = [];
+        let enemyPvPDragons = [];
+        let currentPlayerDragonIndex = 0;
+        let currentEnemyDragonIndex = 0;
+        let selectedSlot = null;
+
+        // Initialize Game
+        window.onload = function() {
+            hideAllScreens();
+            document.getElementById("mainMenu").style.display = "flex";
+            let savedUser = sessionStorage.getItem("currentUser");
+            if (savedUser) {
+                currentUser = savedUser;
+                let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+                if (accounts[currentUser]) {
+                    cash = accounts[currentUser].cash || 0;
+                    player.dragonIndex = accounts[currentUser].dragonIndex || 0;
+                    loadDragonStats();
+                    if (!accounts[currentUser].ownedDragons) accounts[currentUser].ownedDragons = [0];
+                    if (!accounts[currentUser].dragons) accounts[currentUser].dragons = [{ upgrades: 0, maxHp: 100, atkMin: 10, atkMax: 10 }];
+                    if (!accounts[currentUser].redeemedCodes) accounts[currentUser].redeemedCodes = [];
+                    if (!accounts[currentUser].levelCompletions) accounts[currentUser].levelCompletions = {};
+                    for (let user in accounts) {
+                        if (accounts[user].dragons) {
+                            for (let dragonIndex in accounts[user].dragons) {
+                                let dragonData = accounts[user].dragons[dragonIndex];
+                                if (dragonData.upgrades > 99) dragonData.upgrades = 99;
+                            }
+                        }
+                    }
+                    localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+                    document.getElementById("createAccountBtn").style.display = "none";
+                    document.getElementById("loginBtn").style.display = "none";
+                    document.getElementById("logoutBtn").style.display = "block";
+                    updateCashDisplay();
+                    updateLevelMenu();
+                    updateDragonDisplay();
+                    updateUpgradeButton();
+                    if (currentUser === "2222225") {
+                        document.getElementById("codeManager").style.display = "flex";
+                        updateActiveCodesList();
+                    }
+                }
+            }
+        };
+
+        // Helper to hide all screens
+        function hideAllScreens() {
+            document.getElementById("mainMenu").style.display = "none";
+            document.getElementById("dragonSelectionMenu").style.display = "none";
+            document.getElementById("levelMenu").style.display = "none";
+            document.getElementById("arena").style.display = "none";
+        }
+
+        // Show Dragon Selection Menu
+        function showDragonSelection() {
+            if (!currentUser) {
+                alert("Please login or create an account first!");
+                return;
+            }
+            hideAllScreens();
+            document.getElementById("dragonSelectionMenu").style.display = "flex";
+            pvpDragons = [];
+            updateDragonSlots();
+            populateDragonList();
+        }
+
+        // Show Level Menu
+        function showLevelMenu() {
+            if (!currentUser) {
+                alert("Please login or create an account first!");
+                return;
+            }
+            hideAllScreens();
+            document.getElementById("levelMenu").style.display = "flex";
+            updateLevelMenu();
+        }
+
+        // Update Dragon Slots
+        function updateDragonSlots() {
+            for (let i = 1; i <= 3; i++) {
+                let slot = document.getElementById(`slot${i}`);
+                let dragon = pvpDragons[i - 1];
+                if (dragon) {
+                    slot.innerHTML = `
+                        <span class="slot-emoji">${getDragonEmoji(dragon.index, dragon.upgrades)}</span>
+                        <div class="slot-stats">
+                            Level ${dragon.upgrades + 1}<br>
+                            HP: ${dragon.maxHp}<br>
+                            ATK: ${dragon.atkMin}-${dragon.atkMax}<br>
+                            STA: ${dragon.maxSta}
+                        </div>
+                    `;
+                } else {
+                    slot.innerHTML = "<p>Select a Dragon</p>";
+                }
+            }
+        }
+
+        // Populate Dragon List for Selection
+        function populateDragonList() {
+            let dragonList = document.getElementById("dragonList");
+            dragonList.innerHTML = "";
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let ownedDragons = accounts[currentUser].ownedDragons || [0];
+
+            ownedDragons.forEach(index => {
+                let dragonData = accounts[currentUser].dragons[index] || {
+                    upgrades: 0,
+                    maxHp: dragons[index].baseHp,
+                    atkMin: dragons[index].baseAtkMin,
+                    atkMax: dragons[index].baseAtkMax
+                };
+                let dragonDiv = document.createElement("div");
+                dragonDiv.className = "dragon-option";
+                dragonDiv.innerHTML = `
+                    <div class="dragon-option-emoji">${getDragonEmoji(index, dragonData.upgrades)}</div>
+                    <p>Dragon ${index}</p>
+                `;
+                dragonDiv.onclick = () => selectDragon(index);
+                dragonList.appendChild(dragonDiv);
+            });
+        }
+
+        // Open Dragon List for a Slot
+        function openDragonList(slotNumber) {
+            selectedSlot = slotNumber;
+            let dragonListContainer = document.getElementById("dragonListContainer");
+            dragonListContainer.style.display = "flex";
+        }
+
+        // Select Dragon for Slot
+        function selectDragon(dragonIndex) {
+            if (!selectedSlot) return;
+
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let ownedDragons = accounts[currentUser].ownedDragons || [0];
+
+            if (!ownedDragons.includes(dragonIndex)) {
+                alert("You do not own this dragon!");
+                return;
+            }
+
+            // Check for duplicates
+            let isDuplicate = pvpDragons.some(dragon => dragon && dragon.index === dragonIndex);
+            if (isDuplicate) {
+                alert("You can only select each dragon once!");
+                return;
+            }
+
+            let dragonData = accounts[currentUser].dragons[dragonIndex] || {
+                upgrades: 0,
+                maxHp: dragons[dragonIndex].baseHp,
+                atkMin: dragons[dragonIndex].baseAtkMin,
+                atkMax: dragons[dragonIndex].baseAtkMax
+            };
+
+            let dragon = {
+                index: dragonIndex,
+                maxHp: dragonData.maxHp,
+                hp: dragonData.maxHp,
+                atkMin: dragonData.atkMin,
+                atkMax: dragonData.atkMax,
+                maxSta: dragons[dragonIndex].baseSta,
+                sta: dragons[dragonIndex].baseSta,
+                upgrades: dragonData.upgrades,
+                element: dragons[dragonIndex].element,
+                knockedOut: false
+            };
+
+            pvpDragons[selectedSlot - 1] = dragon;
+            updateDragonSlots();
+            document.getElementById("dragonListContainer").style.display = "none";
+            selectedSlot = null;
+        }
+
+        // Start PvP Battle
+        function startPvPBattle() {
+            if (pvpDragons.length < 1) {
+                alert("Select at least one dragon!");
+                return;
+            }
+            if (cash < 15) {
+                alert("Not enough cash! Battle costs $15.");
+                return;
+            }
+            cash -= 15;
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            accounts[currentUser].cash = cash;
+            localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            updateCashDisplay();
+
+            generateEnemyPvPDragons();
+            currentPlayerDragonIndex = 0;
+            currentEnemyDragonIndex = 0;
+
+            hideAllScreens();
+            document.getElementById("arena").style.display = "flex";
+            resetPvPGame();
+            updatePvPQueue();
+        }
+
+        // Generate Enemy PvP Dragons
+        function generateEnemyPvPDragons() {
+            enemyPvPDragons = [];
+            let avgLevel = pvpDragons.reduce((sum, d) => sum + d.upgrades, 0) / pvpDragons.length || 0;
+            let count = Math.min(pvpDragons.length + Math.floor(Math.random() * 2), 3);
+
+            for (let i = 0; i < count; i++) {
+                let index = Math.floor(Math.random() * dragons.length);
+                let levelVariation = Math.floor(Math.random() * 11) - 5;
+                let upgrades = Math.max(0, Math.min(99, Math.floor(avgLevel) + levelVariation));
+                let baseDragon = dragons[index];
+                let dragon = {
+                    index: index,
+                    maxHp: baseDragon.baseHp + upgrades * 5,
+                    hp: baseDragon.baseHp + upgrades * 5,
+                    atkMin: baseDragon.baseAtkMin + upgrades * 2,
+                    atkMax: baseDragon.baseAtkMax + upgrades * 2,
+                    maxSta: baseDragon.baseSta,
+                    sta: baseDragon.baseSta,
+                    upgrades: upgrades,
+                    element: baseDragon.element,
+                    knockedOut: false
+                };
+                enemyPvPDragons.push(dragon);
+            }
+        }
+
+        // Update PvP Queue
+        function updatePvPQueue() {
+            let playerQueue = document.getElementById("dragonQueue");
+            let enemyQueue = document.getElementById("enemyQueue");
+            playerQueue.innerHTML = "";
+            enemyQueue.innerHTML = "";
+
+            pvpDragons.forEach((dragon, i) => {
+                let div = document.createElement("div");
+                div.className = "queue-dragon";
+                if (dragon.knockedOut) div.classList.add("knocked-out");
+                div.innerHTML = i === currentPlayerDragonIndex ? `<b>${getDragonEmoji(dragon.index, dragon.upgrades)}</b>` : getDragonEmoji(dragon.index, dragon.upgrades);
+                playerQueue.appendChild(div);
+            });
+
+            enemyPvPDragons.forEach((dragon, i) => {
+                let div = document.createElement("div");
+                div.className = "queue-dragon";
+                if (dragon.knockedOut) div.classList.add("knocked-out");
+                div.innerHTML = i === currentEnemyDragonIndex ? `<b>${getDragonEmoji(dragon.index, dragon.upgrades)}</b>` : getDragonEmoji(dragon.index, dragon.upgrades);
+                enemyQueue.appendChild(div);
+            });
+        }
+
+        // Reset PvP Game
+        function resetPvPGame() {
+            pvpDragons.forEach(dragon => dragon.knockedOut = false);
+            enemyPvPDragons.forEach(dragon => dragon.knockedOut = false);
+            player = pvpDragons[currentPlayerDragonIndex];
+            enemy = enemyPvPDragons[currentEnemyDragonIndex];
+            document.getElementById("playerArenaEmoji").innerHTML = getDragonEmoji(player.index, player.upgrades);
+            document.getElementById("playerArenaElement").textContent = elementIcons[player.element];
+            document.getElementById("enemyArenaEmoji").innerHTML = getDragonEmoji(enemy.index, enemy.upgrades);
+            document.getElementById("playerHealth").style.width = "100%";
+            document.getElementById("playerStamina").style.width = "100%";
+            document.getElementById("enemyHealth").style.width = "100%";
+            document.getElementById("enemyStamina").style.width = "100%";
+            updateHealthColor(document.getElementById("playerHealth"), player.hp, player.maxHp);
+            updateHealthColor(document.getElementById("enemyHealth"), enemy.hp, enemy.maxHp);
+            document.getElementById("chatMessages").innerHTML = "PvP Battle begins!";
+            battleEnded = false;
+            playerTurn = true;
+        }
+
+        // Attack Function
+        function attack(type) {
+            if (battleEnded || !playerTurn) return;
+
+            let playerSection = document.getElementById("playerSection");
+            let enemySection = document.getElementById("enemySection");
+            let playerHealth = document.getElementById("playerHealth");
+            let playerStamina = document.getElementById("playerStamina");
+            let enemyHealth = document.getElementById("enemyHealth");
+            let enemyStamina = document.getElementById("enemyStamina");
+            let playerDamageText = document.getElementById("playerDamageText");
+            let enemyDamageText = document.getElementById("enemyDamageText");
+            let damage = 0;
+            let staminaCost = 0;
+
+            if (type === "claw") {
+                damage = Math.floor(Math.random() * (player.atkMax - player.atkMin + 1)) + player.atkMin;
+            } else if (type === "tail" && player.sta >= 2) {
+                damage = Math.floor(Math.random() * (player.atkMax - player.atkMin + 1)) + player.atkMin + 5;
+                staminaCost = 2;
+                player.sta -= staminaCost;
+            } else {
+                return;
+            }
+
+            if (elementStrengths[player.element] === enemy.element) {
+                damage *= 1.5;
+            }
+
+            playerSection.style.transform = "translateX(50px)";
+            setTimeout(() => playerSection.style.transform = "translateX(0)", 200);
+
+            enemyDamageText.textContent = `-${Math.floor(damage)}`;
+            enemyDamageText.style.opacity = "1";
+            enemyDamageText.style.transform = "translateY(-20px)";
+            setTimeout(() => {
+                enemyDamageText.style.opacity = "0";
+                enemyDamageText.style.transform = "translateY(0)";
+            }, 500);
+
+            enemy.hp -= damage;
+            if (enemy.hp < 0) enemy.hp = 0;
+            enemyHealth.style.width = `${(enemy.hp / enemy.maxHp) * 100}%`;
+            playerStamina.style.width = `${(player.sta / player.maxSta) * 100}%`;
+            updateHealthColor(enemyHealth, enemy.hp, enemy.maxHp);
+
+            if (enemy.hp <= 0) {
+                enemy.knockedOut = true;
+                currentEnemyDragonIndex++;
+                if (currentEnemyDragonIndex >= enemyPvPDragons.length) {
+                    document.getElementById("chatMessages").innerHTML += `<br>Victory! You win the PvP battle!`;
+                    cash += 30;
+                    let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+                    accounts[currentUser].cash = cash;
+                    localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+                    updateCashDisplay();
+                    disableButtons();
+                    battleEnded = true;
+                    setTimeout(returnToMenu, 2000);
+                    return;
+                } else {
+                    enemy = enemyPvPDragons[currentEnemyDragonIndex];
+                    document.getElementById("enemyArenaEmoji").innerHTML = getDragonEmoji(enemy.index, enemy.upgrades);
+                    document.getElementById("enemyHealth").style.width = "100%";
+                    document.getElementById("enemyStamina").style.width = "100%";
+                    updateHealthColor(document.getElementById("enemyHealth"), enemy.hp, enemy.maxHp);
+                    updatePvPQueue();
+                }
+            }
+
+            playerTurn = false;
+
+            setTimeout(() => {
+                if (battleEnded) return;
+
+                let enemyBaseDamage = Math.floor(Math.random() * (enemy.atkMax - enemy.atkMin + 1)) + enemy.atkMin;
+                let enemyDamage = enemyBaseDamage;
+                if (elementStrengths[enemy.element] === player.element) {
+                    enemyDamage *= 1.5;
+                }
+
+                enemySection.style.transform = "translateX(-50px)";
+                setTimeout(() => enemySection.style.transform = "translateX(0)", 200);
+
+                playerDamageText.textContent = `-${Math.floor(enemyDamage)}`;
+                playerDamageText.style.opacity = "1";
+                playerDamageText.style.transform = "translateY(-20px)";
+                setTimeout(() => {
+                    playerDamageText.style.opacity = "0";
+                    playerDamageText.style.transform = "translateY(0)";
+                }, 500);
+
+                player.hp -= enemyDamage;
+                if (player.hp < 0) player.hp = 0;
+                playerHealth.style.width = `${(player.hp / player.maxHp) * 100}%`;
+                enemyStamina.style.width = `${(enemy.sta / enemy.maxSta) * 100}%`;
+                updateHealthColor(playerHealth, player.hp, player.maxHp);
+
+                if (player.hp <= 0) {
+                    player.knockedOut = true;
+                    currentPlayerDragonIndex++;
+                    if (currentPlayerDragonIndex >= pvpDragons.length) {
+                        document.getElementById("chatMessages").innerHTML += `<br>Defeat! You lose the PvP battle!`;
+                        disableButtons();
+                        battleEnded = true;
+                        setTimeout(returnToMenu, 2000);
+                    } else {
+                        player = pvpDragons[currentPlayerDragonIndex];
+                        document.getElementById("playerArenaEmoji").innerHTML = getDragonEmoji(player.index, player.upgrades);
+                        document.getElementById("playerArenaElement").textContent = elementIcons[player.element];
+                        document.getElementById("playerHealth").style.width = "100%";
+                        document.getElementById("playerStamina").style.width = "100%";
+                        updateHealthColor(document.getElementById("playerHealth"), player.hp, player.maxHp);
+                        updatePvPQueue();
+                        playerTurn = true;
+                    }
+                } else {
+                    playerTurn = true;
+                }
+            }, 1500);
+        }
+
+        // Start Game (for Level Mode)
+        function startGame(level) {
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let highestLevel = currentUser && accounts[currentUser]?.highestLevel || 0;
+            if (level > highestLevel + 1) {
+                alert(`You must beat Level ${level - 1} first!`);
+                return;
+            }
+
+            if (!accounts[currentUser]?.ownedDragons?.includes(player.dragonIndex)) {
+                alert(`You need to purchase the dragon to use it! Switching to your default dragon.`);
+                player.dragonIndex = accounts[currentUser]?.ownedDragons[0] || 0;
+                loadDragonStats();
+                updateDragonDisplay();
+            }
+
+            currentLevel = level;
+            hideAllScreens();
+            document.getElementById("arena").style.display = "flex";
+            resetGame();
+            updateCashDisplay();
+
+            document.getElementById("playerArenaEmoji").innerHTML = getDragonEmoji(player.dragonIndex, player.upgrades);
+            document.getElementById("playerArenaElement").textContent = elementIcons[dragons[player.dragonIndex].element];
+
+            if (level === 30) {
+                document.getElementById("enemyArenaEmoji").innerHTML = `<img src="https://i.imgur.com/LHOBsug.png" style="width: 150px; height: 150px;" />`;
+                enemy.maxHp = 620 + 5;
+                enemy.hp = enemy.maxHp;
+                enemy.atkMin = 85 + 2;
+                enemy.atkMax = 115 + 2;
+                enemy.sta = 10;
+                enemy.element = "Fire";
+            } else {
+                enemy.maxHp = 100 + (level - 1) * 10;
+                enemy.hp = enemy.maxHp;
+                enemy.atkMin = 5 + (level - 1) * 2;
+                enemy.atkMax = 15 + (level - 1) * 2;
+                enemy.sta = 5;
+                enemy.element = level >= 35 ? "Earth" : "Ice";
+                if (level >= 46) document.getElementById("enemyArenaEmoji").innerHTML = `<img src="https://i.imgur.com/LHOBsug.png" style="width: 150px; height: 150px;" />`;
+                else if (level >= 35) document.getElementById("enemyArenaEmoji").textContent = "🐍";
+                else if (level >= 21) document.getElementById("enemyArenaEmoji").textContent = "🐲";
+                else document.getElementById("enemyArenaEmoji").textContent = "🐉";
+            }
+            document.getElementById("enemyHealth").style.width = "100%";
+            document.getElementById("enemyStamina").style.width = "100%";
+            updateHealthColor(document.getElementById("enemyHealth"), enemy.hp, enemy.maxHp);
+        }
+
+        // Return to Menu from Selection
+        function returnToMenuFromSelection() {
+            hideAllScreens();
+            document.getElementById("mainMenu").style.display = "flex";
+        }
+
+        // Return to Main Menu
+        function returnToMenu() {
+            hideAllScreens();
+            document.getElementById("mainMenu").style.display = "flex";
+            resetGame();
+            enableButtons();
+            updateCashDisplay();
+            updateDragonDisplay();
+            updateUpgradeButton();
+            if (currentUser === "2222225") {
+                updateActiveCodesList();
+            }
+        }
+
+        // Reset Game State
+        function resetGame() {
+            player.hp = player.maxHp;
+            player.sta = player.maxSta;
+            if (currentLevel === 30) {
+                enemy.maxHp = 620 + 5;
+                enemy.hp = enemy.maxHp;
+                enemy.atkMin = 85 + 2;
+                enemy.atkMax = 115 + 2;
+                enemy.sta = 10;
+                enemy.element = "Fire";
+            } else {
+                enemy.maxHp = 100 + (currentLevel - 1) * 10;
+                enemy.hp = enemy.maxHp;
+                enemy.atkMin = 5 + (currentLevel - 1) * 2;
+                enemy.atkMax = 15 + (currentLevel - 1) * 2;
+                enemy.sta = 5;
+                enemy.element = currentLevel >= 35 ? "Earth" : "Ice";
+            }
+            document.getElementById("playerHealth").style.width = "100%";
+            document.getElementById("playerStamina").style.width = "100%";
+            document.getElementById("enemyHealth").style.width = "100%";
+            document.getElementById("enemyStamina").style.width = "100%";
+            updateHealthColor(document.getElementById("playerHealth"), player.hp, player.maxHp);
+            updateHealthColor(document.getElementById("enemyHealth"), enemy.hp, enemy.maxHp);
+            document.getElementById("chatMessages").innerHTML = "Battle begins!";
+            battleEnded = false;
+            playerTurn = true;
+        }
+
+        // Update Health Bar Color
+        function updateHealthColor(bar, hp, maxHp) {
+            if (hp / maxHp > 0.5) bar.style.background = "#4caf50";
+            else if (hp / maxHp > 0.25) bar.style.background = "#ff9800";
+            else bar.style.background = "#f44336";
+        }
+
+        // Disable Buttons
+        function disableButtons() {
+            let buttons = document.getElementsByTagName("button");
+            for (let i = 0; i < buttons.length; i++) buttons[i].disabled = true;
+        }
+
+        // Enable Buttons
+        function enableButtons() {
+            let buttons = document.getElementsByTagName("button");
+            for (let i = 0; i < buttons.length; i++) buttons[i].disabled = false;
+        }
+
+        // Update Cash Display
+        function updateCashDisplay() {
+            document.getElementById("cashDisplay").textContent = `$${cash}`;
+        }
+
+        // Update Dragon Display
+        function updateDragonDisplay() {
+            let dragon = dragons[player.dragonIndex];
+            let level = player.upgrades + 1;
+            let statsElement = document.getElementById("dragonStats");
+            statsElement.innerHTML = `Level ${level}<br>HP: ${player.maxHp}<br>ATK: ${player.atkMin}-${player.atkMax}<br>STA: ${player.maxSta}`;
+            document.getElementById("dragonEmoji").innerHTML = getDragonEmoji(player.dragonIndex, player.upgrades);
+            document.getElementById("dragonElement").textContent = elementIcons[dragon.element];
+
+            let dragonInfo = document.querySelector(".dragon-info");
+            dragonInfo.className = "dragon-info";
+
+            const frameData = dragonFrames[player.dragonIndex];
+            if (frameData) {
+                if (player.upgrades >= 99 && frameData.maxLevelClass) {
+                    dragonInfo.classList.add(frameData.maxLevelClass);
+                    statsElement.classList.add(frameData.statsClass);
+                } else if (frameData.frameClass) {
+                    dragonInfo.classList.add(frameData.frameClass);
+                    if (player.upgrades >= 99) statsElement.classList.add(frameData.statsClass);
+                }
+            } else if (player.upgrades >= 99) {
+                statsElement.classList.add("max-level");
+            }
+
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            if (!currentUser || !accounts[currentUser]?.ownedDragons?.includes(player.dragonIndex)) {
+                document.getElementById("upgradeButton").style.display = "none";
+                document.getElementById("buyButton").style.display = "block";
+                document.getElementById("buyButton").textContent = `Buy ($${dragon.price})`;
+            } else {
+                document.getElementById("upgradeButton").style.display = "block";
+                document.getElementById("buyButton").style.display = "none";
+            }
+        }
+
+        // Update Level Menu
+        function updateLevelMenu() {
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let highestLevel = currentUser && accounts[currentUser]?.highestLevel || 0;
+            for (let i = 1; i <= 5; i++) {
+                let levelElement = document.getElementById(`level${i}`);
+                if (levelElement) {
+                    if (i <= highestLevel + 1) {
+                        levelElement.classList.remove("locked");
+                    } else {
+                        levelElement.classList.add("locked");
+                    }
+                }
+            }
+        }
+
+        // Update Level Progress
+        function updateProgress(level) {
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let highestLevel = currentUser && accounts[currentUser]?.highestLevel || 0;
+            if (level > highestLevel) {
+                accounts[currentUser].highestLevel = level;
+                localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            }
+        }
+
+        // Award Cash
+        function awardCash(level) {
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            if (!accounts[currentUser]?.levelCompletions) accounts[currentUser].levelCompletions = {};
+            let completions = accounts[currentUser].levelCompletions[level] || 0;
+
+            let baseReward = 30;
+            let fullReward = Math.floor(baseReward * Math.pow(1.1, level - 1));
+            let reductionFactor = Math.pow(0.6, completions);
+            let reward = Math.max(Math.floor(fullReward * reductionFactor), 5);
+
+            cash += reward;
+            accounts[currentUser].levelCompletions[level] = completions + 1;
+            accounts[currentUser].cash = cash;
+            accounts[currentUser].dragonIndex = player.dragonIndex;
+            localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            document.getElementById("chatMessages").innerHTML += `<br>You earned $${reward} for beating Level ${level}!`;
+        }
+
+        // Upgrade Dragon
+        function upgradeDragon() {
+            if (player.upgrades >= 99) return;
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let upgradeCost = calculateUpgradeCost(player.upgrades);
+            if (cash < upgradeCost) {
+                alert("Not enough cash to upgrade!");
+                return;
+            }
+            cash -= upgradeCost;
+            player.upgrades++;
+            player.maxHp += 5;
+            player.atkMin += 2;
+            player.atkMax += 2;
+            player.hp = player.maxHp;
+            accounts[currentUser].cash = cash;
+            accounts[currentUser].dragons[player.dragonIndex] = {
+                upgrades: player.upgrades,
+                maxHp: player.maxHp,
+                atkMin: player.atkMin,
+                atkMax: player.atkMax
+            };
+            localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            updateCashDisplay();
+            updateDragonDisplay();
+            updateUpgradeButton();
+        }
+
+        // Calculate Upgrade Cost
+        function calculateUpgradeCost(upgrades) {
+            if (upgrades < 10) {
+                return Math.floor(59 * Math.pow(1.15, upgrades));
+            } else {
+                return Math.floor(59 * Math.pow(1.10, upgrades));
+            }
+        }
+
+        // Update Upgrade Button
+        function updateUpgradeButton() {
+            let upgradeCost = calculateUpgradeCost(player.upgrades);
+            document.getElementById("upgradeButton").textContent = `Upgrade ($${upgradeCost})`;
+        }
+
+        // Switch to Next Dragon
+        function nextDragon() {
+            player.dragonIndex = (player.dragonIndex + 1) % dragons.length;
+            loadDragonStats();
+            updateDragonDisplay();
+        }
+
+        // Switch to Previous Dragon
+        function prevDragon() {
+            player.dragonIndex = (player.dragonIndex - 1 + dragons.length) % dragons.length;
+            loadDragonStats();
+            updateDragonDisplay();
+        }
+
+        // Load Dragon Stats
+        function loadDragonStats() {
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            let dragonData = currentUser && accounts[currentUser]?.dragons?.[player.dragonIndex] || {};
+            let baseDragon = dragons[player.dragonIndex];
+            player.maxHp = dragonData.maxHp || baseDragon.baseHp;
+            player.atkMin = dragonData.atkMin || baseDragon.baseAtkMin;
+            player.atkMax = dragonData.atkMax || baseDragon.baseAtkMax;
+            player.maxSta = baseDragon.baseSta;
+            player.hp = player.maxHp;
+            player.sta = player.maxSta;
+            player.upgrades = dragonData.upgrades || 0;
+            player.element = baseDragon.element;
+        }
+
+        // Buy Dragon
+        function buyDragon(index) {
+            let dragon = dragons[index];
+            if (cash < dragon.price) {
+                alert("Not enough cash to buy this dragon!");
+                return;
+            }
+            cash -= dragon.price;
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            accounts[currentUser].ownedDragons.push(index);
+            accounts[currentUser].cash = cash;
+            accounts[currentUser].dragons[index] = {
+                upgrades: 0,
+                maxHp: dragon.baseHp,
+                atkMin: dragon.baseAtkMin,
+                atkMax: dragon.baseAtkMax
+            };
+            localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            updateCashDisplay();
+            updateDragonDisplay();
+            alert(`Purchased ${dragon.emoji} dragon!`);
+        }
+
+        // Submit Code
+        function submitCode() {
+            if (!currentUser) {
+                alert("Please login or create an account first!");
+                return;
+            }
+            let code = document.getElementById("codeInput").value.trim();
+            if (!code) return;
+            let codes = JSON.parse(localStorage.getItem("dragonCodes") || "{}");
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            if (!accounts[currentUser].redeemedCodes) accounts[currentUser].redeemedCodes = [];
+
+            if (!codes[code]) {
+                alert("Invalid code!");
+                return;
+            }
+            if (accounts[currentUser].redeemedCodes.includes(code)) {
+                alert("Code already redeemed!");
+                return;
+            }
+
+            cash += codes[code];
+            accounts[currentUser].cash = cash;
+            accounts[currentUser].redeemedCodes.push(code);
+            localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            updateCashDisplay();
+            alert(`Code redeemed! You received $${codes[code]}`);
+            document.getElementById("codeInput").value = "";
+        }
+
+        // Add Code
+        function addCode() {
+            if (currentUser !== "2222225") return;
+            let code = document.getElementById("newCode").value.trim();
+            let reward = parseInt(document.getElementById("codeReward").value);
+            if (!code || isNaN(reward) || reward <= 0) {
+                alert("Please enter a valid code and reward!");
+                return;
+            }
+            let codes = JSON.parse(localStorage.getItem("dragonCodes") || "{}");
+            if (codes[code]) {
+                alert("Code already exists!");
+                return;
+            }
+            codes[code] = reward;
+            localStorage.setItem("dragonCodes", JSON.stringify(codes));
+            alert(`Code "${code}" added with $${reward} reward!`);
+            document.getElementById("newCode").value = "";
+            document.getElementById("codeReward").value = "";
+            updateActiveCodesList();
+        }
+
+        // Delete Code
+        function deleteCode(code) {
+            if (currentUser !== "2222225") return;
+            let codes = JSON.parse(localStorage.getItem("dragonCodes") || "{}");
+            if (codes[code]) {
+                delete codes[code];
+                localStorage.setItem("dragonCodes", JSON.stringify(codes));
+                alert(`Code "${code}" has been deactivated!`);
+                updateActiveCodesList();
+            }
+        }
+
+        // Update Active Codes List
+        function updateActiveCodesList() {
+            if (currentUser !== "2222225") return;
+            let codes = JSON.parse(localStorage.getItem("dragonCodes") || "{}");
+            let activeCodesList = document.getElementById("activeCodesList");
+            activeCodesList.innerHTML = "";
+
+            for (let code in codes) {
+                let codeItem = document.createElement("div");
+                codeItem.className = "code-item";
+                codeItem.innerHTML = `
+                    <span class="code-details">${code}: $${codes[code]}</span>
+                    <span class="delete-code" onclick="deleteCode('${code}')">🗑️</span>
+                `;
+                activeCodesList.appendChild(codeItem);
+            }
+        }
+
+        // Send Chat Message
+        function sendMessage() {
+            let input = document.getElementById("chatInput");
+            let message = input.value.trim();
+            if (message) {
+                document.getElementById("chatMessages").innerHTML += `<br>${message}`;
+                input.value = "";
+                document.getElementById("log").scrollTop = document.getElementById("log").scrollHeight;
+            }
+        }
+
+        // Send Message on Enter
+        document.getElementById("chatInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // Account System
+        function showCreateAccount() {
+            isCreatingAccount = true;
+            document.getElementById("accountForm").style.display = "flex";
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("submitAccount").textContent = "Create Account";
+        }
+
+        function showLogin() {
+            isCreatingAccount = false;
+            document.getElementById("accountForm").style.display = "flex";
+            document.getElementById("username").value = "";
+            document.getElementById("password").value = "";
+            document.getElementById("submitAccount").textContent = "Login";
+        }
+
+        function handleAccountSubmit() {
+            let username = document.getElementById("username").value.trim();
+            let password = document.getElementById("password").value.trim();
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+
+            if (username.length < 3 || password.length < 6) {
+                alert("Username must be at least 3 characters and password at least 6 characters!");
+                return;
+            }
+
+            if (isCreatingAccount) {
+                if (accounts[username]) {
+                    alert("Username already exists!");
+                    return;
+                }
+                accounts[username] = {
+                    password,
+                    cash: username === "2222225" ? 100000 : 0,
+                    highestLevel: 0,
+                    completedLevels: [],
+                    ownedDragons: [0],
+                    dragons: [{ upgrades: 0, maxHp: 100, atkMin: 10, atkMax: 10 }],
+                    redeemedCodes: [],
+                    levelCompletions: {},
+                    dragonIndex: 0
+                };
+                localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+                alert("Account created successfully! Please login.");
+                showLogin();
+            } else {
+                if (!accounts[username] || accounts[username].password !== password) {
+                    alert("Invalid username or password!");
+                    return;
+                }
+                currentUser = username;
+                cash = accounts[username].cash;
+                if (username === "2222225" && cash === 0) cash = 100000;
+                accounts[username].cash = cash;
+                player.dragonIndex = accounts[username].dragonIndex || 0;
+                loadDragonStats();
+                if (!accounts[username].ownedDragons) accounts[username].ownedDragons = [0];
+                if (!accounts[username].dragons) accounts[username].dragons = [{ upgrades: 0, maxHp: 100, atkMin: 10, atkMax: 10 }];
+                if (!accounts[username].redeemedCodes) accounts[username].redeemedCodes = [];
+                if (!accounts[username].levelCompletions) accounts[username].levelCompletions = {};
+                localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+                sessionStorage.setItem("currentUser", currentUser);
+                document.getElementById("createAccountBtn").style.display = "none";
+                document.getElementById("loginBtn").style.display = "none";
+                document.getElementById("logoutBtn").style.display = "block";
+                document.getElementById("accountForm").style.display = "none";
+                updateCashDisplay();
+                updateLevelMenu();
+                updateDragonDisplay();
+                updateUpgradeButton();
+                if (currentUser === "2222225") {
+                    document.getElementById("codeManager").style.display = "flex";
+                    updateActiveCodesList();
+                }
+            }
+        }
+
+        function logout() {
+            let accounts = JSON.parse(localStorage.getItem("dragonAccounts") || "{}");
+            accounts[currentUser].cash = cash;
+            accounts[currentUser].dragonIndex = player.dragonIndex;
+            accounts[currentUser].dragons[player.dragonIndex] = {
+                upgrades: player.upgrades,
+                maxHp: player.maxHp,
+                atkMin: player.atkMin,
+                atkMax: player.atkMax
+            };
+            localStorage.setItem("dragonAccounts", JSON.stringify(accounts));
+            sessionStorage.removeItem("currentUser");
+            currentUser = null;
+            cash = 0;
+            player.dragonIndex = 0;
+            loadDragonStats();
+            document.getElementById("createAccountBtn").style.display = "block";
+            document.getElementById("loginBtn").style.display = "block";
+            document.getElementById("logoutBtn").style.display = "none";
+            document.getElementById("codeManager").style.display = "none";
+            updateCashDisplay();
+            updateDragonDisplay();
+            updateUpgradeButton();
+        }
+
+        // Get Dragon Emoji
+        function getDragonEmoji(index, upgrades) {
+            if (index === 3 && upgrades >= 99) {
+                return `<img src="https://i.imgur.com/cJnQKd0.png" style="width: 150px; height: 150px;" />`;
+            } else if (index === 7 && upgrades >= 99) {
+                return `<img src="https://i.imgur.com/VaDt2aL.png" style="width: 150px; height: 150px;" />`;
+            }
+            return dragons[index].emoji;
+        }
+    </script>
+</body>
+</html>
